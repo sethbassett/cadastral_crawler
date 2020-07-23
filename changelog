@@ -1,0 +1,26 @@
+
+# v0.21  
+  + modules moved to module folder  
+  + search module now uses shinyWidgets instead of DT::dataTable
+
+# v0.2  
+  + breadth-first network search now running  
+  + search module tighted down and abstracted  
+  + UI switched to shinythemes vs shinyDashboard  
+  + database credential file used rather than hardcoded connection credentials  
+  
+# v0.14  
+  + search functions moved to search module  
+  
+# v0.13  
+  + minor improvements in back end code  
+
+# v0.12  
+  + minor improvements in back end code  
+  
+# v0.1  
+  + base app established  
+  + database configured  
+  + basic queries written  
+  
+  
