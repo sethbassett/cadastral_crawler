@@ -1,8 +1,32 @@
 # The Cadastral Crawler  
 
-A prototype geospatial PostGIS/Shiny-Server application for exploring relationships in land ownership and property records.  
+This is prototype geospatial PostGIS/Shiny-Server application for exploring relationships in land ownership and property records that is particularly suited for ferreting out shell corporations used to hide large land purchases.  
+
+A live demo of the app can be found here: **link to app**  
   
-# Philosophical Motivations  
+This version of the Cadastral Crawler software is licensed under the APGL v3.0. If you are interested in a commercial license and/or a custom application suited to your own need, please contact me directly at seth[dot]bassett[at]gmail[dot]com.  
+
+# How the application works   
+
+The true name of a land owner is trivial easy to hide: just register a corporation and transfer the land to that legal entity. Registering a corporation takes less than $200 and 10 minutes in Florida, and private companies are not required to disclose ownership into public records.  
+  
+However, every owner of a parcel has to register a legal address where they can be reached by the State of Florida, whether for taxation or legal disputes.  
+
+This application takes a **rhizomatic** approach to the question of parcel ownership by exploiting the owner's recorded physical address.  It builds horizontal links between parcel owners by using the owner address data. 
+  
+The idea is this:  
+  + take any given owner name registered to a parcel, Owner (A)
+  + search the cadastral records for all parcels owned under that name, and compile a list of owner addresses used by that owner: Addresses (1, 2, 3)
+  + use Addresses (1, 2, 3) and search the cadastral records again, this time compiling all Owner Names associated with those addresses. This gives us Owners (B, C, D)
+  + repeat the process until the maximum search depth is reached or the search tree is exhausted, whichever comes first  
+    
+For more information and why this logic works exceptionally well at ferreting out subsidary and shell corporation used by big players in the Florida property market, see the **Background** section below.  
+  
+# How to install  
+  
+At present, you can't. This application is in early-stage development. I'm currently building towards Beta release v1.0, which will be dockerized for easy deployment.  
+
+# Background Theory  
 
 > We are segmented from all around and in every direction. The human being is a segmentary animal. Segmentarity is inherent to all the strata composing us. Dwelling, getting around, working, playing: life is spatiall and socially segmented. The house is segmented according to its rooms' assigned purposes; streets, according to the order of the city; the factory, according to the nature of the work and operations performed in it.  
 > - Deluze and Guattari, *A Thousand Plateaus: Capitalism and Schizophrenia* (1987)
@@ -68,15 +92,11 @@ For several reasons, the arboreal apprach is precisely the wrong approach to use
   3. Companies incorporate under state governments, so for a truly exhaustive search, data from the other 49 states also needs munged into a common format.  
   4.  Parcel data is also notoriously bad, and the same companies are frequently registered under 'close but not exact' names, e.g. Northeast Development, LLC vs NE Development LLC.  
   
-# How the application works   
 
-This application takes a **rhizomatic** approach to the question of parcel ownership by exploiting the owner's recorded physical address.  It builds links horizontal links between between parcel ownership using the owner address data using nothing but the parcel data itself.  
-
-The process works like this:  
   
-  1. Search parcels owned by a particular land owner by name.
-  2. name and return all owner addresses registered.  
-  2. For each parcel
+
+
+
   
 
 
