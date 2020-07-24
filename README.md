@@ -24,34 +24,9 @@ For more information and why this logic works exceptionally well at ferreting ou
   
 # How to install  
   
-At present, you can't. This application is in early-stage development. I'm currently building towards Beta release v1.0, which will be dockerized for easy deployment.  
+At present, you can't. This application is in early-stage development and the background data is around 30 Gb when written to a plain-text .sql file. I'm currently building towards Beta release v1.0, which will be dockerized for easy deployment and will pull the cadastral data from a web source.  
 
-# Background Theory  
-
-> We are segmented from all around and in every direction. The human being is a segmentary animal. Segmentarity is inherent to all the strata composing us. Dwelling, getting around, working, playing: life is spatiall and socially segmented. The house is segmented according to its rooms' assigned purposes; streets, according to the order of the city; the factory, according to the nature of the work and operations performed in it.  
-> - Deluze and Guattari, *A Thousand Plateaus: Capitalism and Schizophrenia* (1987)
-  
-> It has always been this way with the map-makers: from their first scratches on the cave wall to show the migration patterns of the herds, they have traced lines and lived inside them. 
-> -Maya Sonenberge, *Cartographies* (1989)  
-
-> ...maps provide the very conditions of possibility for the worlds we inhabit and the subjects we become.  
-> - John Pickles, *A History of Spaces* (2004)  
-
-Geography, they say, is the discipline of mapping the earth. It is supposedly a discipline of reading and transcribing the surface of the earth onto a the surface of a map. Fewer people seem to recognize that geography is also primary the mechanism by which human beings *inscribe human social divisions onto the earth's surface*.  
-  
-Take a common example: a large, multi-acre parcel is sold off to a corporate developer to developmen into a neighborhood of single-family residential homes. The developer hires licensed surveyors to subdivide the single multiacre parcel into small, individual lots. Once the indivual lots are subdivided on an abstract map, a veritable army of humans begins to alter the earth's surface to fit. Road and utility conduits are constructed to follow the boundaries of the subdivided parcels, connecting each parcel to the wider civic infrastructure. The lots are sold to prospective home owners who, once they own the parcel, begin alter the landscape. They change the landscape inside their parcel, cutting and filling the earth and replanting the native vegetation with gardens and decorative plants. Homeowners are also - barring rules or laws against it - notorious for fencing the boundaries of the parcel to keep out casual trespassers and insure privacy against the nosy neighbors. 
-  
-Reality, in other words, is altered to suit the abstract lines drawn on a map. An entire army of people - from surveyors to realators to engineers to landscapers and fence builders - work together to inscribe the abstract boundaries of the cadastral map into tangible boundaries on the surface of the earth.
-  
-The cadastral map of property ownership is an enormously important and largely unseen structural force that organizes the *hows* and *whys* of modern economic, political, and social life. As an anonymous wag once put it, "they aren't making land anymore" and the boundaries of who owns what land *now* constrain what can happen in the future.  
-  
-For the most part, the middle class's terminal dream of owning their own little piece of property is almost entirely extraneous to the production of the cadastral map. The middle class is left to purchase the remnant parcels that the big players - large corporations and the wealthiest individuals - deign to subdivide and sell at a profit. 
-  
-The big players in the property market often one or more semi-anonymous corporate and legal entities to acquire and hold various parcels. Unlike the middle class - who, like the feudal serf, are often (legally) bound directly to the land they inhabit - the big players own a significant amount of real property tied to them via private companies and their subsidiaries.  
-  
-The purpose of this app is to shed light onto the big players in the Florida property market and pierce the veil of semi-anonymous shell companies that help obfuscate who truly owns a property.  
-
-## The Shell Game
+# Background: The Shell Game
 
 Once upon a time, Walt Disney became discontent with the numerous fast food joints and hotels that sprang up just outside the gates of his California park. So Disney began a secret project to build a new park in the middle of the orange groves in central Florida. His goal was to acquire enough land that he could buffer his park from other landowners and control every facet of his customer's experience once inside the boundaries of the land he owned.  
 
@@ -61,7 +36,7 @@ This is why Disney is Florida's 68th county: the corporation leveraged their lan
 
 ## Anyone can be a semi-anonymous land owner  
 
-Disney's shell game is by no means unique. In fact, incredibly common to own land indirectly through a semi-anonymous or anonymous legal entity like a corporation and nearly anyone can do it. Incorporating a business in Florida is extremely easy, and requires only three things: around $200 in spare cash, a template for the new companies articles of incorporation, and less than 10 minutes of time at sunbiz.com filling out the forms from home.  
+Disney's shell game is by no means unique. In fact, incredibly common to own land indirectly through a semi-anonymous or anonymous legal entity like a corporation and nearly anyone can do it. Incorporating a business in Florida is extremely easy, and requires only three things: around $200 in spare cash, a template for the new company's articles of incorporation, and less than 10 minutes of time at sunbiz.com filling out the forms from home.  
 
 There are numerous reasons - legal, tax, nefarious, and other - that big players purchase and own land through proxies.  
   
