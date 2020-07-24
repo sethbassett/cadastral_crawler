@@ -7,16 +7,7 @@
 #   * denotes a reactive
 #####################
 
-# Database query ----------------------------------------------------------
-get_onames <- function(input){
-  conn <- poolCheckout(pool)
-  input <- paste("%", toupper(input), "%", sep = '')  
-  cleanQuery <- sqlInterpolate(conn, "SELECT oname from parcels_2018 WHERE UPPER(oname) ILIKE ?oname;",
-                               oname = input)
-  results <- dbGetQuery(conn, cleanQuery)
-  poolReturn(conn)
-  return(results)
-}
+
 
 
 # UI Logic ----------------------------------------------------------------
@@ -24,12 +15,13 @@ searchDT <- function(id, label = "Search Output"){
   # Using DT::dataTableOutput
   ns <- NS(id) 
   tagList(
-        textInput(ns("oname"), label = h3('Owner Name')),
-        actionButton(ns('action'), label = "Search"),
-        hr(),
-        DT::dataTableOutput(ns("dt"),
-        width = NULL
-      )
+    hr(),
+    textInput(ns("oname"), label = h3('Search by Owner Name')),
+    actionButton(ns('action'), label = "Search"),
+    hr(),
+    DT::dataTableOutput(ns("dt"),
+                        width = NULL
+    )
   )
 }
 
@@ -37,8 +29,8 @@ searchDT <- function(id, label = "Search Output"){
 searchWidget <- function(id, label = "Results"){
   ns <- NS(id)
   tagList(        
-    textInput(ns("oname"), label = h3('Owner Name')),
-    actionButton(ns('action'), label = "Search"),
+    textInput(ns("oname"), label = h5('Search Owner Records by Name')),
+    actionBttn(ns('action'), label = "Send Query!", color = 'primary', style = 'material-flat', icon = icon('table', lib = 'glyphicon')),
     hr(),
     uiOutput(ns('widget'))
   )
@@ -49,10 +41,9 @@ searchModuleServer <- function(id) {
   moduleServer(
     id,
     function(input, output, session) {
-      
       results <- eventReactive(input$action, {
         withProgress(message = 'Querying Database, this might take a moment...', value = 0.5, {
-          results <- get_onames(input$oname)
+          results <- get_onames_fuzzy(input$oname)
           results <- data.frame(unique(results$oname), stringsAsFactors = F)
           if(nrow(results) == 0){
             return(NULL)
@@ -67,7 +58,7 @@ searchModuleServer <- function(id) {
         results()[results()[,1] %in% input$picker,1]
       })
       
-    # Server UI Logic ---------------------------------------------------------
+      # Server UI Logic ---------------------------------------------------------
       output$widget <- renderUI({
         req(results())
         pickerInput(
@@ -77,9 +68,9 @@ searchModuleServer <- function(id) {
           options = list(
             `live-search` = TRUE,
             `actions-box` = TRUE), 
-             multiple = TRUE
+          multiple = TRUE
         )
       })
-  return(selected)
+      return(selected)
     })
 }

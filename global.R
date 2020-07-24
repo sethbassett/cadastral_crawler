@@ -1,6 +1,6 @@
 # Shiny Packages
 library(shiny)
-#library(shinydashboard)
+library(shinydashboard)
 library(shinyWidgets)
 library(shinythemes)
 library(DT)
@@ -36,8 +36,19 @@ pool <- do.call(dbPool, connectionArgs)
 # modules -----------------------------------------------------------------
 
 source("./modules/search.R")
+source("./modules/network.R")
+#source("./modules/map.R")
 
-
+# Database query ----------------------------------------------------------
+get_onames_fuzzy <- function(input){
+  conn <- poolCheckout(pool)
+  input <- paste("%", toupper(input), "%", sep = '')  
+  cleanQuery <- sqlInterpolate(conn, "SELECT oname from parcels_2018 WHERE UPPER(oname) ILIKE ?oname;",
+                               oname = input)
+  results <- dbGetQuery(conn, cleanQuery)
+  poolReturn(conn)
+  return(results)
+}
 
 # Global Functions --------------------------------------------------------
 
@@ -64,10 +75,6 @@ oname_exact_query <- function(input){
   poolReturn(conn)
   return(results)
 }
-
-
-
-
 
 nocat_query <- function(input){
   conn <- poolCheckout(pool)

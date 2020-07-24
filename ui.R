@@ -1,17 +1,20 @@
 library(shiny)
 
 navbarPage(
-  "Cadastral Crawler v0.21",
-  theme = shinytheme("darkly"),
+  "Cadastral Crawler v0.22",
+  theme = shinytheme("readable"),
     tabPanel("Crawl!",
-      column(4,
+      fluidPage(
+      column(2,
+        networkModuleUI('networkModule'),
         searchWidget('mod1')
         ),
-      column(4,
-        verbatimTextOutput('debug')
-        ),
-      column(4,
-             h4('Placeholder'))
-    )
+      column(5,
+        networkModuleGraph('networkModule')
+      ),
+      column(5,
+        networkModuleMap('networkModule'))
   )
+    )
+)
 

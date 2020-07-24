@@ -200,7 +200,7 @@ graph_step <- function(cadgraph){
   newLinks$title <- rep('a title', nrow(newLinks))
   
   newNodes <- rbind(init_nocat_nodes(links$nocat, currentDepth, pal), init_nodes(links$oname.y, currentDepth, pal))
-
+  
   nodes <- rbind(nodes, newNodes)
   edges <- rbind(edges, newLinks)
   
@@ -208,14 +208,14 @@ graph_step <- function(cadgraph){
     cadgraph$current_depth <- maxDepth + 1
     return(cadgraph)
   } else {
-  # update graph
-
-  cadgraph <- list(nodes = nodes,
-                   edges = edges,
-                   max_depth = maxDepth,
-                   current_depth = currentDepth,
-                   max_nodes = maxNodes,
-                   pal = pal)
+    # update graph
+    
+    cadgraph <- list(nodes = nodes,
+                     edges = edges,
+                     max_depth = maxDepth,
+                     current_depth = currentDepth,
+                     max_nodes = maxNodes,
+                     pal = pal)
   }
   return(cadgraph)
 }
@@ -276,32 +276,183 @@ build_graph <- function(cadgraph){
 }
 
 
-# visGraph Functions ------------------------------------------------------
-
-create_vizgraph <- function(cadgraph, size.col = "n", newScale = c(10,100), layoutType = 'layout_nicely', ...){
-  cadgraph$nodes$size <- rescale(cadgraph$nodes[,size.col], newScale)
-  g <- visNetwork::visNetwork(cadgraph$nodes[,c("id","title","size", "color","shape", 'label')], 
-                              cadgraph$edges, 
-                              submain = cadgraph$title) %>%
-    visNodes(shadow = list(enabled = TRUE, size = 10),
-             font = "9px arial black") %>%
-    visEdges(arrows = "to") %>%
-    #visHierarchicalLayout() %>%
-    visIgraphLayout(layout = layoutType, ...) %>%
-    visOptions(highlightNearest = TRUE, nodesIdSelection = F) %>%
-    visLayout(randomSeed = 111282)
-  return(g)
+# mapping Functions ------------------------------------------------------
+get_parcels_by_oname <- function(onames, geom = T) {
+  conn <- poolCheckout(pool)
+  if(geom==TRUE){
+    cleanQuery <- sqlInterpolate(conn, "SELECT * FROM parcels_2018 WHERE oname IN (?input)", input = SQL(build_in(onames)))
+    print(cleanQuery)
+    results <- pgGetGeom(conn, geom = 'geom', query = cleanQuery)  
+  } else{
+    cleanQuery <- sqlInterpolate(conn, "SELECT parcelid, oname, oaddr1, oaddr2, ocity, ostate, ozipcd, ocat, saleyr1, saleprc1, saleyr2, saleprc2, googlemap FROM parcels_2018 WHERE parcelid IN (?parcels)", parcels = SQL(build_in(parcelids)))
+    results <- dbGetQuery(conn, cleanQuery)
+  }
+  poolReturn(conn)
+  return(results)
 }
 
-test2 <- oname_query("deseret")
-graph2 <- init_graph(test2$oname, maxDepth = 5, maxNodes = 100)
-graph2 <- build_graph(graph2)
-g2 <- create_vizgraph(graph2, size.col = "area", newScale = c(10,150), layoutType = 'layout_nicely')
-g2
+bbox_query <- function(input){
+  conn <- poolCheckout(pool)
+  baseQuery <- "
+  WITH
+  dump_envelope AS (
+  SELECT 
+  (ST_DumpPoints(ST_Envelope(geom))).* 
+  FROM 
+  parcels_2018 
+  WHERE 
+  parcelid IN (?pids)
+  )
+  SELECT MIN(ST_X(geom)) minx,  MIN(ST_Y(geom)) miny, MAX(ST_X(geom)) maxx, MAX(ST_Y(geom)) maxy FROM dump_envelope;
+  "
+  cleanQuery <- sqlInterpolate(conn, baseQuery,
+                               pids= SQL(build_in(input$parcelid)))
+  results <- dbGetQuery(conn, cleanQuery)
+  poolReturn(conn)
+  return(results)
+}
+
+build_map_labels <- function(spatial.df){
+  labels <- sprintf(
+    "<strong>Owner Name:</strong>%s<br/><strong>Parcel ID: </strong>%s<br/><strong>Sale 1: </strong>%g (%g)<br/>, <strong>Sale 2: </strong>%g (%g)<br/><a href=%s>Google Maps</a>",
+    spatial.df$oname, spatial.df$parcelid, spatial.df$saleprc1, spatial.df$saleyr1, spatial.df$saleprc2, spatial.df$saleyr2, spatial.df$googlemap) %>% 
+    lapply(htmltools::HTML)
+}
 
 
-m2 <- basic_map(graph2)
-m2
+
+# Shiny UI Logic ----------------------------------------------------------
+networkModuleUI <- function(id){
+  ns <- NS(id)
+  tagList(
+    fluidRow(
+      uiOutput(ns('widget'))
+      # valueBoxOutput(ns("node_box")),
+      # valueBoxOutput(ns("edge_box")),
+      # valueBoxOutput(ns("owner_box"))
+    )
+  )
+}
+
+networkModuleGraph <- function(id){
+  ns <- NS(id)
+  tagList(
+    fluidRow(
+      visNetworkOutput(ns('network'), width = "100%", height = "600px")
+    )
+  )
+}
+
+networkModuleMap <- function(id){
+  ns <- NS(id)
+  tagList(
+    fluidRow(
+      leafletOutput(ns('map'), width = "100%", height = "600px")
+    )
+  )
+}
+
+# Shiny Server Logic ------------------------------------------------------
+
+networkModuleServer <- function(id, onames) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      
+      
+      results <- eventReactive(input$crawl, {
+        # build graph
+        withProgress(message = 'Building graph...', value = 0.25, {
+          cadgraph <- init_graph(onames(), maxDepth = 5, maxNodes = 100)
+          
+          #print(cadgraph)
+          cadgraph <- build_graph(cadgraph)
+        })
+        return(cadgraph)
+      })
+      
+      
+      # Server UI Logic ---------------------------------------------------------
+      output$widget <- renderUI({
+        req(onames())
+        ns <- session$ns
+        actionBttn(inputId = ns('crawl'), 
+                   label = "Build Network!", 
+                   color = 'warning', 
+                   style = 'material-flat',
+                   icon = icon('diagram-2', lib = 'glyphicon'))
+      })
+      
+      output$node_box <- renderValueBox({
+        ns <- session$ns
+        req(onames(), results())
+        valueBox(results()$summary$n_nodes, 'Nodes')
+      })
+      
+      output$edge_box <- renderValueBox({
+        ns <- session$ns
+        req(onames(), results())
+        valueBox(results()$summary$n_edges, 'Edges')
+      })
+      
+      output$owner_box <- renderValueBox({
+        ns <- session$ns
+        req(onames(), results())
+        valueBox(results()$summary$n_owners, 'Owners')
+      })
+      
+      output$map <- renderLeaflet({
+        req(onames(), results())
+        cadgraph <- results()
+        parcels <- cadgraph$parcels
+        bbox <- bbox_query(parcels)
+        labels <- build_map_labels(parcels)
+        factpal <- colorFactor(cadgraph$pal, parcels$oname)
+        leaflet(parcels) %>% 
+          fitBounds(bbox$minx, bbox$miny, bbox$maxx, bbox$maxy) %>%
+          addProviderTiles(providers$Esri.WorldGrayCanvas) %>% 
+          addPolygons(data = parcels, 
+                      fillColor = ~factpal(oname),
+                      color = 'burlywood',
+                      dashArray = "3",
+                      fillOpacity = 0.7,
+                      weight = 1.5,
+                      group = 'parcels',
+                      popup = labels,
+                      label = ~oname,
+                      highlight = highlightOptions(
+                        weight = 5,
+                        color = "cyan",
+                        dashArray = "",
+                        fillOpacity = 0.7,
+                        bringToFront = TRUE))
+        
+      })
+      
+      output$network <- renderVisNetwork({
+        ns <- session$ns
+        req(onames(), results())
+        size.col = "n"
+        newScale = c(10,100)
+        layoutType = 'layout_nicely'
+        cadgraph <- results()
+        cadgraph$nodes$size <- rescale(cadgraph$nodes[,size.col], newScale)
+        visNetwork::visNetwork(cadgraph$nodes[,c("id","title","size", "color","shape", 'label')], 
+                                    cadgraph$edges, 
+                                    submain = cadgraph$title) %>%
+          visNodes(shadow = list(enabled = TRUE, size = 10),
+                   font = "9px arial black") %>%
+          visEdges(arrows = "to") %>%
+          #visHierarchicalLayout() %>%
+          visIgraphLayout(layout = layoutType) %>%
+          visOptions(highlightNearest = TRUE, nodesIdSelection = F) %>%
+          visLayout(randomSeed = 111282)
+      })
+      
+      #return(selected)
+    })
+}
+
 
 
 
