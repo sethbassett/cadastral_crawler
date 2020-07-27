@@ -1,20 +1,24 @@
-library(shiny)
-
-navbarPage(
-  "Cadastral Crawler v0.22",
-  theme = shinytheme("readable"),
-    tabPanel("Crawl!",
-      fluidPage(
-      column(2,
-        networkModuleUI('networkModule'),
-        searchWidget('mod1')
-        ),
-      column(5,
-        networkModuleGraph('networkModule')
+tagList(
+  tags$head(includeScript("navAppend.js")),
+  navbarPage(
+      "Cadastral Crawler v0.23",
+      theme = shinytheme("slate"),
+        tabPanel("Main App",
+          fluidPage(
+              column(2,
+                     searchInput('searchModule'),
+                     searchWidget('searchModule'),
+                     networkModuleUI('networkModule'),
+                     downloadModuleUI('downloadModule')),
+              column(5,
+                     networkModuleGraph('networkModule')
+              ),
+              column(5,
+                     networkModuleMap('networkModule')
+              )
+        )
       ),
-      column(5,
-        networkModuleMap('networkModule'))
-  )
-    )
+      tabPanel('Tutorial', 
+               includeMarkdown('docs/Tutorial.Rmd'))
+      )
 )
-

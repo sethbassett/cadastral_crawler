@@ -8,29 +8,27 @@
 #####################
 
 
-
-
-# UI Logic ----------------------------------------------------------------
-searchDT <- function(id, label = "Search Output"){
-  # Using DT::dataTableOutput
-  ns <- NS(id) 
-  tagList(
-    hr(),
-    textInput(ns("oname"), label = h3('Search by Owner Name')),
-    actionButton(ns('action'), label = "Search"),
-    hr(),
-    DT::dataTableOutput(ns("dt"),
-                        width = NULL
-    )
+# using shinyWidgets
+searchInput <- function(id, label = "Results"){
+  ns <- NS(id)
+  tagList(        
+    textInput(ns("oname"), 
+              label = h5('Search Owner Records by Name'),
+              value = "Deseret",
+              width = '100%'
+    ),
+    actionBttn(ns('action'), 
+               label = "Query Data", 
+               color = 'primary', 
+               style = 'material-flat', 
+               icon = icon('table', lib = 'glyphicon'),
+               block = TRUE)
   )
 }
 
-# using shinyWidgets
 searchWidget <- function(id, label = "Results"){
   ns <- NS(id)
-  tagList(        
-    textInput(ns("oname"), label = h5('Search Owner Records by Name')),
-    actionBttn(ns('action'), label = "Send Query!", color = 'primary', style = 'material-flat', icon = icon('table', lib = 'glyphicon')),
+  tagList(
     hr(),
     uiOutput(ns('widget'))
   )
@@ -41,9 +39,11 @@ searchModuleServer <- function(id) {
   moduleServer(
     id,
     function(input, output, session) {
+      
       results <- eventReactive(input$action, {
         withProgress(message = 'Querying Database, this might take a moment...', value = 0.5, {
           results <- get_onames_fuzzy(input$oname)
+          #results <- get_nonames_fuzzy(input$oname)
           results <- data.frame(unique(results$oname), stringsAsFactors = F)
           if(nrow(results) == 0){
             return(NULL)
@@ -63,13 +63,13 @@ searchModuleServer <- function(id) {
         req(results())
         pickerInput(
           inputId = session$ns('picker'),
-          label = "Select Results: ", 
+          label = h5("Select Results: "), 
           choices = results(),
           options = list(
             `live-search` = TRUE,
             `actions-box` = TRUE), 
-          multiple = TRUE
-        )
+          multiple = TRUE,
+          width = '100%')
       })
       return(selected)
     })

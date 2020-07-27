@@ -18,9 +18,14 @@ sudo apt install -y postgresql-10-pgrouting
 ### install GDAL and libgeos++-dev
 sudo apt install -y libgdal-dev libproj-dev 
 sudo apt install -y libgeos++-dev
+# for R package sf
+sudo apt install -y libudunits2-dev
 
-#### install R 3.6
-sudo sh -c 'echo "deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/" >> /etc/apt/sources.list'
+# for R package mapshaper
+sudo apt install -y libprotobuf-dev
+
+#### install R 4.0
+sudo sh -c 'echo "deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/" >> /etc/apt/sources.list'
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
 sudo apt update
 sudo apt install -y r-base
@@ -46,7 +51,7 @@ sudo su - \
 
 # Shiny packages
 sudo su - \
--c "R -e \"install.packages(c('shinydashboard','shinyWidgets','shinythemes','DT'), repos='https://cran.rstudio.com/')\""
+-c "R -e \"install.packages(c('shinydashboard','shinyWidgets','shinythemes','DT', 'htmlwidgets'), repos='https://cran.rstudio.com/')\""
 
 # Database packages
 sudo su - \
@@ -63,6 +68,12 @@ sudo su - \
 # plotting packages
 sudo su - \
 -c "R -e \"install.packages(c('wesanderson','ggplot2','ggthemes', 'plotly'), repos='https://cran.rstudio.com/')\""
+
+# spatial packages
+sudo su - \
+-c "R -e \"install.packages(c('leaflet','leaflet.extras','sp','sf'), repos='https://cran.rstudio.com/')\""
+
+
 
 
 ### install git 

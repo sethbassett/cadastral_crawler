@@ -9,6 +9,7 @@ library(DT)
 library(sp)
 library(leaflet)
 library(leaflet.extras)
+library(sf)
 
 # Database Packages
 library(pool)
@@ -27,6 +28,12 @@ library(dplyr)
 # Aesthetics
 library(wesanderson)
 
+#files
+library(zip)
+
+
+
+
 credentials <- read.csv('./credentials.env', stringsAsFactors = F, header = F)
 connectionArgs <- sapply(credentials[,2],list)
 names(connectionArgs) <- credentials[,1]
@@ -37,7 +44,7 @@ pool <- do.call(dbPool, connectionArgs)
 
 source("./modules/search.R")
 source("./modules/network.R")
-#source("./modules/map.R")
+source("./modules/download.R")
 
 # Database query ----------------------------------------------------------
 get_onames_fuzzy <- function(input){
@@ -50,6 +57,17 @@ get_onames_fuzzy <- function(input){
   return(results)
 }
 
+get_nonames_fuzzy <- function(input){
+  conn <- poolCheckout(pool)
+  input <- gsub(' ', '', input)
+  input <- gsub('\\.', '', input)
+  input <- paste("%", toupper(input), "%", sep = '')  
+  cleanQuery <- sqlInterpolate(conn, "SELECT noname from parcels_2018 WHERE UPPER(noname) ILIKE ?oname;",
+                               oname = input)
+  results <- dbGetQuery(conn, cleanQuery)
+  poolReturn(conn)
+  return(results)
+}
 # Global Functions --------------------------------------------------------
 
 oname_query <- function(input, wildcard = T){

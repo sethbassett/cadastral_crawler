@@ -1,0 +1,23 @@
+---
+title: "Tutorial"
+author: "Seth Bassett, GISP"
+date: "July 27, 2020"
+output: html_document
+---
+
+```{r include=FALSE, echo=FALSE, warning=FALSE}
+knitr::opts_chunk$set(include=FALSE, echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+# Introduction  
+
+The Cadastral Crawler leverages the 1:m relationship between owner names and registered address to crawl through the cadastral record horizontally, building a directed graph network of the relationship between owner names and their registered addresses.
+
+# Tutorial  
+
+Geting started is easy: all we need to do is enter a partial owner name. Your query is automatically wrapped in wildcards so it will find partial matches.  
+  
+For this Tutorial, we are going to use the Deseret Ranches, which is a subsidiary corporation of the Mormon Church. [The Mormon Church is now one of the largest land owners in Florida, and owns an estimated 2% of the total landmass in the state](https://www.reuters.com/article/usa-florida-mormons/mormon-church-set-to-become-floridas-largest-private-landowner-idUSL2N0IT2AZ20131108)  
+  
+
+  

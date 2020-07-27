@@ -1,4 +1,10 @@
-
+# v0.23  
+  + add downlaod module  
+  + rework UI to be prettier  
+  + add tutorial.RMD  
+  + add link to github page  
+  + lots of tiny bugfixes  
+  
 # v0.21  
   + modules moved to module folder  
   + search module now uses shinyWidgets instead of DT::dataTable
