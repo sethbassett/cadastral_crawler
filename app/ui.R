@@ -1,7 +1,7 @@
 tagList(
   tags$head(includeScript("navAppend.js")),
   navbarPage(
-      "Cadastral Crawler v0.23",
+      "Cadastral Crawler v0.24",
       theme = shinytheme("slate"),
         tabPanel("Main App",
           fluidPage(
@@ -19,6 +19,6 @@ tagList(
         )
       ),
       tabPanel('Tutorial', 
-               includeMarkdown('docs/Tutorial.Rmd'))
+               includeHTML('www/Tutorial.html'))
       )
 )

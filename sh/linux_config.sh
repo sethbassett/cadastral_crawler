@@ -63,7 +63,7 @@ sudo su - \
 
 # data manipulation packages
 sudo su - \
--c "R -e \"install.packages(c('scales','dplyr'), repos='https://cran.rstudio.com/')\""
+-c "R -e \"install.packages(c('scales','dplyr','zip'), repos='https://cran.rstudio.com/')\""
 
 # plotting packages
 sudo su - \

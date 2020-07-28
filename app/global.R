@@ -42,9 +42,9 @@ pool <- do.call(dbPool, connectionArgs)
 
 # modules -----------------------------------------------------------------
 
-source("./modules/search.R")
-source("./modules/network.R")
-source("./modules/download.R")
+source("modules/search.R")
+source("modules/network.R")
+source("modules/download.R")
 
 # Database query ----------------------------------------------------------
 get_onames_fuzzy <- function(input){

@@ -1,2 +1,4 @@
 # ignore any environment file  
 *.env
+.Rdata  
+.Rhistory  
